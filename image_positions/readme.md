@@ -9,7 +9,7 @@ The script simply looks at the image filename (timestamp) and compares it to the
 ### Usage
 Running `python trajectory_processor.py -h` will display the available options.
 
-Available options:
+Available options: 
 `--trajectory /path/to/your/trajectory.txt` : File that RayStudio generates.
 
 `--image_folder /path/to/your/images` : The location of the images folders. if you have 4 cameras, you'll have 4 folders, one for front, back, left, right images. Run the script 4 times to generate 4 output files (one for each folder of images).*
