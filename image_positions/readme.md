@@ -27,3 +27,24 @@ Once you have generated the output.csv files, load the images into Metashape, an
 Make sure that "Start import at row" : 2 is selected.
 Make sure that Comma delimeter is used.
 Make sure that the column headers match what Metashape expects buy changing the column numbers.
+
+
+### Code funtion
+
+Here's a simple description of how the code functions:
+
+1. __Image Filename Usage__:
+
+   - The script reads image filenames from a specified folder.
+   - It extracts timestamps from the filenames using a regular expression pattern that matches the numeric timestamp format (e.g., `1734442346.592496`).
+
+2. __Position and Rotation Interpolation__:
+
+   - The script reads trajectory data from a CSV file, which contains position (x, y, z) and quaternion rotation values at specific timestamps.
+   - For each image timestamp extracted from the filenames, the script finds the nearest timestamps in the CSV data.
+   - It then calculates interpolated position (x, y, z) and rotation (roll, pitch, yaw in degrees) values based on the closest matching timestamps in the trajectory data.
+
+3. __Output File__:
+
+   - The processed data, including image filenames and their corresponding positions and rotations, is saved to a new CSV file.
+   - By default, the output file is named `processed_trajectories.csv` and saved in the same directory as the script (`src/` by default).
