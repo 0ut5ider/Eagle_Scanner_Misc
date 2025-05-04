@@ -1,5 +1,5 @@
-# Eagle_Scanner_Misc
-Various pieces of code for making life simpler with the Eagle lidar scanner
+# Eagle Scanner misc tools and information
+Various pieces of code, instructions and workflows for making life simpler when working with the Eagle lidar scanner.
 
 ### [Image Positions](https://github.com/0ut5ider/Eagle_Scanner_Misc/tree/main/image_positions)
 
