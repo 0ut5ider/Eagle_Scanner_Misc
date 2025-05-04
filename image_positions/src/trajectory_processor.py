@@ -10,7 +10,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Process trajectory data and image timestamps')
     
     # Required arguments
-    parser.add_argument('--csv_path', type=str, 
+    parser.add_argument('--trajectory', type=str, 
                        default='recalculate_trj.txt',
                        help='Path to the CSV file containing trajectory data')
     parser.add_argument('--image_folder', type=str,
@@ -24,7 +24,7 @@ def parse_arguments():
 
 # Parse command line arguments
 args = parse_arguments()
-CSV_PATH = args.csv_path
+TRAJECTORY_PATH = args.trajectory
 IMAGE_FOLDER = args.image_folder
 OUTPUT_CSV = args.output_csv
 
@@ -36,11 +36,11 @@ if not os.path.exists(IMAGE_FOLDER):
 image_files = [f for f in os.listdir(IMAGE_FOLDER) if f.endswith('.jpg')]
 
 # Read CSV data, assuming each line has space-separated values
-if not os.path.exists(CSV_PATH):
-    print(f"Error: CSV file '{CSV_PATH}' does not exist.")
+if not os.path.exists(TRAJECTORY_PATH):
+    print(f"Error: CSV file '{TRAJECTORY_PATH}' does not exist.")
     exit(1)
 
-with open(CSV_PATH, 'r') as f:
+with open(TRAJECTORY_PATH, 'r') as f:
     lines = f.readlines()
     
 # Skip comment lines and process valid lines
@@ -172,9 +172,9 @@ for img_filename, img_ts in zip(image_files, image_timestamps):
         'x': x,
         'y': y,
         'z': z,
+        'yaw': yaw,
         'pitch': pitch,
-        'roll': roll,
-        'yaw': yaw
+        'roll': roll
     })
 
 # Create DataFrame and write to CSV
