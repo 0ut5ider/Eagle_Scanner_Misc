@@ -2,6 +2,15 @@
 
 Workflow for coloring a point cloud using all the images captured by the Eagle lidar scanner.
 
+Advantages over the RayStudio software (currently 1.0.5)
+- No pointcloud offset
+- Images from all cameras can be used to color the point cloud, not just the front camera images (as available in RayStudio)
+
+Workflow currently needs Metashape Pro. I haven't investigated if the Non-Pro version will work.  
+ 
+Reality Capture will not work since it cannot load unstructured point clouds.
+3DF Zephyr is unkown. I don't have a license for it so can't check.
+
 ### High level overview
 
 1. Process bag files in RayStudio to generate a point cloud, a trajectory file and a folder contaiing all the fisheye images captured by the scanner.
