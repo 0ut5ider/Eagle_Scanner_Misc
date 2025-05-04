@@ -15,10 +15,18 @@ Running `python trajectory_processor.py -h` will display the available options.
 Available options:
 `--trajectory /path/to/your/trajectory.txt` : File that RayStudio generates.
 
-`--image_folder /path/to/your/images` : The location of the images folders. if you have 4 cameras, you'll have 4 folders, one for front, back, left, right images. Run the script 4 times to generate 4 output files (one for each folder of images). 
+`--image_folder /path/to/your/images` : The location of the images folders. if you have 4 cameras, you'll have 4 folders, one for front, back, left, right images. Run the script 4 times to generate 4 output files (one for each folder of images).*
 
 `--output_csv /path/to/output.csv` : File which contains the position information for the images. This gets imported into MEtashape.
 
 general usage:
 `python trajectory_processor.py --trajectory trajectory.txt --image_folder images --output_csv output.csv`
 
+
+* currently the script does not recursively search for images in sub folders. If your Eagle has 4 cameras, you'll have to run the script 4 times and generate 4 output files in order to process images from all the front/back/left/right image folders.
+
+
+Once you have generated the output.csv files, load the images into Metashape, and from the "Reference" window click the "Import Reference date" (first icon on the left).
+Make sure that "Start import at row" : 2 is selected.
+Make sure that Comma delimeter is used.
+Make sure that the column headers match what Metashape expects buy changing the column numbers.
