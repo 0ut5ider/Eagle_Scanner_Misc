@@ -33,7 +33,13 @@ if not os.path.exists(IMAGE_FOLDER):
     print(f"Error: Image folder '{IMAGE_FOLDER}' does not exist.")
     exit(1)
 
-image_files = [f for f in os.listdir(IMAGE_FOLDER) if f.endswith('.jpg')]
+# Recursively find all JPG files in the specified image folder
+image_files_paths = []
+for root, dirs, files in os.walk(IMAGE_FOLDER):
+    for file in files:
+        if file.lower().endswith('.jpg'): # Case-insensitive check
+            full_path = os.path.join(root, file)
+            image_files_paths.append(full_path)
 
 # Read CSV data, assuming each line has space-separated values
 if not os.path.exists(TRAJECTORY_PATH):
@@ -83,8 +89,6 @@ def extract_timestamp(filename):
         return float(match.group(1))
     return None
 
-image_timestamps = [extract_timestamp(f) for f in image_files]
-
 # Interpolate position data
 def interpolate_position(csv_ts, csv_x, csv_y, csv_z, target_ts):
     # Find indices where timestamps are just below and above the target
@@ -126,12 +130,24 @@ def quaternion_to_euler(qx, qy, qz, qw):
     
     # Convert from radians to degrees
     return np.degrees(euler)
-
 # Process each image and calculate its properties
 processed_data = []
-for img_filename, img_ts in zip(image_files, image_timestamps):
-    if img_ts is None:
-        continue  # Skip files with invalid timestamp format
+image_data_tuples = [] # Store tuples of (full_path, filename, timestamp)
+
+# Extract timestamps and prepare data for processing
+for full_path in image_files_paths:
+    filename = os.path.basename(full_path) # Get filename from path
+    img_ts = extract_timestamp(filename)   # Extract timestamp from filename
+    if img_ts is not None:
+        image_data_tuples.append((full_path, filename, img_ts))
+    else:
+        print(f"Warning: Could not extract timestamp from {filename}. Skipping.")
+
+# Sort by timestamp to ensure correct interpolation order if needed, although interpolation handles unsorted data
+image_data_tuples.sort(key=lambda item: item[2]) 
+
+for full_path, img_filename, img_ts in image_data_tuples: # Use the new list of tuples
+    # Note: img_ts is already checked for None above
         
     # Get interpolated position
     x, y, z = interpolate_position(timestamps, 
@@ -168,7 +184,7 @@ for img_filename, img_ts in zip(image_files, image_timestamps):
     pitch, roll, yaw = quaternion_to_euler(qx, qy, qz, qw)
     
     processed_data.append({
-        'filename': img_filename,
+        'filename': img_filename, # Use the base filename for the output CSV
         'x': x,
         'y': y,
         'z': z,
