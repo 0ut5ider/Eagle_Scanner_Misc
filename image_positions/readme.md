@@ -6,6 +6,13 @@ All the images captured by the eagle scanner are given filenames which are the t
 
 The script simply looks at the image filename (timestamp) and compares it to the nearest timestamp in the trajectory file. It then linearly interpoates the translations/rotations from the nearest neighbours.
 
+### Dependencies
+
+You need python to be installed.
+You will also need `numpy` and `pandas to be installed.
+Use `pip install numpy pandas` to install the dependencies. 
+
+
 ### Usage
 Running `python trajectory_processor.py -h` will display the available options.
 
