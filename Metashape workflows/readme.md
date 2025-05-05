@@ -21,9 +21,6 @@ Reality Capture will not work since it cannot load unstructured point clouds.
 
 ## Detailed wokflow steps
 
-Coming soon.
-
-
 ### Import trajectory file
 - Use space delimiter
 - The columns in the trajectory file are TimeStamp, x, y, z, (and rotations, which willnot be used). Make sure the Metashape columns line up with the columns in the file. The Metashape defaults should be good.
