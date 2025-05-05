@@ -12,6 +12,10 @@ You need python to be installed.
 You will also need `numpy` and `pandas to be installed.
 Use `pip install numpy pandas` to install the dependencies. 
 
+A clarification on role Metashape plays oin this scripts usage. 
+- You do not need /metashape to run this script.
+- This script is not meant to be run from Metashape. 
+- This script is meant to be ran on it's own, in a command line or powershell terminal.
 
 ### Usage
 Running `python trajectory_processor.py -h` will display the available options.
