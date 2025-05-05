@@ -34,16 +34,7 @@ general usage:
 
 You don't have to specify each image folder individually. The script will recursivey search all sub folders for all jpg images, and use them all when generating the output pose csv file
 
-Once you have generated the output.csv files, load the images into Metashape, and from the "Reference" window click the "Import Reference date" (first icon on the left). 
-
-![image](https://github.com/user-attachments/assets/54afb1c8-a7b5-4568-a4ed-5d67a550c98f)
-
-
-Make sure that "Start import at row" : 2 is selected.
-Make sure that Comma delimeter is used.
-Make sure that the column headers match what Metashape expects buy changing the column numbers.
-![image](https://github.com/user-attachments/assets/af8c1f4c-d34f-4ab7-8192-54d997487cbf)
-
+Once you generate a csv file, follow the instructins in the [Metashape Workflows](https://github.com/0ut5ider/Eagle_Scanner_Misc/tree/main/Metashape%20workflows) page.
 
 ### Code funtion
 

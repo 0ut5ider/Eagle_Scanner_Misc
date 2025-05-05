@@ -64,11 +64,13 @@ At this point we need to use the "Image_Position" script to generate a new csv f
 ### Adding the Reference camera positions to Metashape
 - On the bottom left of the Metashape window, there is a "Reference" tab. Click it. You should now see a list of all your images down the left side of the Metashape window.
 - Above the list of images there is a row of small icons. Select the left most icon, and select the file "camera-pose.csv" from the "Using the scipt" step.
+![image](https://github.com/user-attachments/assets/54afb1c8-a7b5-4568-a4ed-5d67a550c98f)
 - Make sure the "Coordinate system" is set to "Local Coordinates"
 - Delimiter should be "Comma"
 - Make sure "Rotations" is checked
 - "Start import at row" should be set to 2
 - Make sure the Metashape columns line up with the column names from the file. Adjust as necessary to achieve the correct name alignment.
+![image](https://github.com/user-attachments/assets/af8c1f4c-d34f-4ab7-8192-54d997487cbf)
 - After you click OK, the list of images on the left side should now show x,y,z and rotation coordinates.
 - Select all the images  (using CTRL+A will do that), then right click on any image and seclet "Modify" (at the bottom of the menu)
 - Select the "Accuravy (m)" option, and enter 0.05. This should tell Metashape how much error the position of each camera can have. I don't know if 0.05 is optimal, but it's better than the 10m default value.
