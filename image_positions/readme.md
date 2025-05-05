@@ -59,3 +59,5 @@ Here's a simple description of how the code functions:
 
    - The processed data, including image filenames and their corresponding positions and rotations, is saved to a new CSV file.
    - By default, the output file is named `processed_trajectories.csv` and saved in the same directory as the script (`src/` by default).
+
+   HH
