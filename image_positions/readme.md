@@ -30,6 +30,7 @@ Available options:
 general usage:
 `python trajectory_processor.py --trajectory trajectory.txt --image_folder images --output_csv pose_output.csv`
 
+[Workflows](https://github.com/0ut5ider/Eagle_Scanner_Misc/tree/main/Metashape%20workflows)
 
 You don't have to specify each image folder individually. The script will recursivey search all sub folders for all jpg images, and use them all when generating the output pose csv file
 
