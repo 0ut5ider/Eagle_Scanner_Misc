@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trajectory Processor</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Trajectory Processor</h1>
+            <p>Convert image positions using trajectory data</p>
+        </header>
+
+        <main>
+            <section class="drop-zones">
+                <div class="drop-zone" id="image-folder-drop">
+                    <div class="drop-zone-prompt">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWZvbGRlci1vcGVuIj48cGF0aCBkPSJtNiAxNC41IDEuNzMtMTAuMzdhMyAyIDAgMCAxIDItMS42M2g2LjU0YTIgMiAwIDAgMSAyIDEuNjNMMjAgMTQuNSIvPjxwYXRoIGQ9Ik0yIDE0LjVoMjAiLz48cGF0aCBkPSJNNS4xMiAxOC41aDE0Ljc2YTIgMiAwIDAgMCAxLjk1LTEuNTdMMjIuNSAxMC41SDIuNWwuNjcgNi40M2EyIDIgMCAwIDAgMS45NSAxLjU3WiIvPjwvc3ZnPg==" alt="Folder Icon" class="drop-zone-icon">
+                        <span class="drop-zone-text">Drag & Drop Image Folder Here</span>
+                        <span class="drop-zone-subtext">or</span>
+                        <input type="file" id="image-folder-input" webkitdirectory directory multiple class="drop-zone-input">
+                        <label for="image-folder-input" class="drop-zone-button">Select Folder</label>
+                    </div>
+                    <div class="drop-zone-info" id="image-folder-info">
+                        <p>No folder selected</p>
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="trajectory-file-drop">
+                    <div class="drop-zone-prompt">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWZpbGUtdGV4dCI+PHBhdGggZD0iTTE0IDJINmEyIDIgMCAwIDAtMiAydjE2YTIgMiAwIDAgMCAyIDJoMTJhMiAyIDAgMCAwIDItMlY4eiIvPjxwYXRoIGQ9Ik0xNCAydjZoNiIvPjxwYXRoIGQ9Ik0xNiAxM0g4Ii8+PHBhdGggZD0iTTE2IDE3SDgiLz48cGF0aCBkPSJNMTAgOUg4Ii8+PC9zdmc+" alt="File Icon" class="drop-zone-icon">
+                        <span class="drop-zone-text">Drag & Drop Trajectory File Here</span>
+                        <span class="drop-zone-subtext">or</span>
+                        <input type="file" id="trajectory-file-input" accept=".txt,.csv" class="drop-zone-input">
+                        <label for="trajectory-file-input" class="drop-zone-button">Select File</label>
+                    </div>
+                    <div class="drop-zone-info" id="trajectory-file-info">
+                        <p>No file selected</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="actions">
+                <button id="process-button" class="primary-button" disabled>Begin Processing</button>
+            </section>
+
+            <section class="results" id="results-section">
+                <div class="progress-container" id="progress-container" style="display: none;">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div id="results-content" style="display: none;">
+                    <h2>Processing Complete</h2>
+                    <p>Your file has been processed successfully.</p>
+                    <a id="download-link" class="download-button" download="pose_output.csv">Download pose_output.csv</a>
+                </div>
+                <div id="error-content" style="display: none;">
+                    <h2>Error</h2>
+                    <p id="error-message"></p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Based on the Eagle Scanner Trajectory Processor</p>
+        </footer>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/fileHandler.js"></script>
+    <script src="js/processor.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
