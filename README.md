@@ -1,6 +1,17 @@
 # Eagle Scanner misc tools and information
 Various pieces of code, instructions and workflows for making life simpler when working with the Eagle lidar scanner.
 
+### [GPS Bag to NMEA Converter](https://github.com/0ut5ider/Eagle_Scanner_Misc/tree/main/GPS_bag_to_NMEA_stream)
+
+Python script to convert ROS1 bag files containing GPS data into NMEA format without requiring ROS1 installation. Handles custom message types and generates standard NMEA RMC sentences with proper checksums.
+
+**Features:**
+- No ROS1 dependency (uses rosbags library)
+- Custom message parser for `rshandheld_location/GpsRmc` format
+- Command line interface with inspection and conversion modes
+- Fast processing (486 messages in seconds)
+- Preserves coordinate accuracy and timing
+
 ### [Image Positions](https://github.com/0ut5ider/Eagle_Scanner_Misc/tree/main/image_positions)
 
 python script to generate imgage spatial position based on the trajectory file contents.
