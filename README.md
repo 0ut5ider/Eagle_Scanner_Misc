@@ -9,7 +9,6 @@ Python script to convert ROS1 bag files containing GPS data into NMEA format wit
 - No ROS1 dependency (uses rosbags library)
 - Custom message parser for `rshandheld_location/GpsRmc` format
 - Command line interface with inspection and conversion modes
-- Fast processing (486 messages in seconds)
 - Preserves coordinate accuracy and timing
 
 ### [Image Positions](https://github.com/0ut5ider/Eagle_Scanner_Misc/tree/main/image_positions)
