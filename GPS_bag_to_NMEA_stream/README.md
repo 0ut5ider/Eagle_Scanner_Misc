@@ -1,4 +1,6 @@
 This python script needs to convert the ROS1 bag file format for a GPS stream into a NMEA data stream.
+There should be no dependence on ROS1 being installed on the system running this script.
+Use the "rosbags" python library by Ternaris to parse the bag file.
 
 Analysis of GPS ros bag file, shows the following:
 
@@ -18,3 +20,4 @@ topics: /GPSRMC 486 msgs : rshandheld_location/GpsRmc
 
 TOPIC: /GPSRMC
 Message Type: rshandheld_location/GpsRmc
+
