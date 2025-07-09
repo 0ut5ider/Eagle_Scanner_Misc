@@ -1,2 +1,8 @@
 eagle_images
 recalculate_trj.txt
+
+# GPS bag to NMEA converter
+GPS_bag_to_NMEA_stream/__pycache__/
+GPS_bag_to_NMEA_stream/venv/
+GPS_bag_to_NMEA_stream/*.nmea
+GPS_bag_to_NMEA_stream/GPS_sample_corrected.nmea
