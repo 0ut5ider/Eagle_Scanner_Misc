@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-ROS1 Bag to NMEA Converter
+ROS1 Bag to GNSS Converter
 
-This script converts GPS data from ROS1 bag files to NMEA format without requiring ROS1 installation.
+This script converts GPS data from ROS1 bag files to GNSS format without requiring ROS1 installation.
 Uses the rosbags library by Ternaris for bag file parsing.
 """
 
@@ -22,91 +22,93 @@ except ImportError:
     sys.exit(1)
 
 
-class NMEAFormatter:
-    """Handles conversion of GPS data to NMEA RMC format."""
+class GNSSFormatter:
+    """Handles conversion of GPS data to GNSS raw format."""
     
     @staticmethod
-    def calculate_checksum(sentence):
-        """Calculate NMEA checksum (XOR of all characters between $ and *)."""
-        checksum = 0
-        # Calculate checksum for the part between $ and * (excluding both)
-        start_idx = 1 if sentence.startswith('$') else 0
-        for char in sentence[start_idx:]:
-            checksum ^= ord(char)
-        return f"{checksum:02X}"
-    
-    @staticmethod
-    def decimal_to_dmm(decimal_degrees):
-        """Convert decimal degrees to degrees and decimal minutes format."""
-        degrees = int(abs(decimal_degrees))
-        minutes = (abs(decimal_degrees) - degrees) * 60.0
-        return degrees, minutes
-    
-    @staticmethod
-    def format_latitude(lat_decimal):
-        """Format latitude for NMEA (ddmm.mmmm,N/S)."""
-        degrees, minutes = NMEAFormatter.decimal_to_dmm(lat_decimal)
-        direction = 'N' if lat_decimal >= 0 else 'S'
-        return f"{degrees:02d}{minutes:07.4f}", direction
-    
-    @staticmethod
-    def format_longitude(lon_decimal):
-        """Format longitude for NMEA (dddmm.mmmm,E/W)."""
-        degrees, minutes = NMEAFormatter.decimal_to_dmm(lon_decimal)
-        direction = 'E' if lon_decimal >= 0 else 'W'
-        return f"{degrees:03d}{minutes:07.4f}", direction
-    
-    @staticmethod
-    def ros_time_to_nmea(ros_timestamp):
-        """Convert ROS timestamp to NMEA time and date format."""
+    def ros_time_to_gps_time(ros_timestamp):
+        """Convert ROS timestamp to GPS time in H:M:S format."""
         # ROS timestamp is typically in seconds since epoch
         dt = datetime.utcfromtimestamp(ros_timestamp)
-        time_str = dt.strftime("%H%M%S.%f")[:-4]  # HHMMSS.SS
-        date_str = dt.strftime("%d%m%y")  # DDMMYY
-        return time_str, date_str
+        # Format as H:M:S (no leading zeros for hours)
+        return dt.strftime("%-H:%M:%S")
     
     @staticmethod
-    def create_rmc_sentence(timestamp, latitude, longitude, speed=0.0, course=0.0, status='A'):
-        """Create NMEA RMC sentence from GPS data."""
-        time_str, date_str = NMEAFormatter.ros_time_to_nmea(timestamp)
-        lat_str, lat_dir = NMEAFormatter.format_latitude(latitude)
-        lon_str, lon_dir = NMEAFormatter.format_longitude(longitude)
+    def timestamp_ns_to_ms(timestamp_ns):
+        """Convert nanosecond timestamp to millisecond timestamp."""
+        return int(timestamp_ns // 1000000)
+    
+    @staticmethod
+    def create_gnss_line(timestamp_ns, latitude, longitude, altitude="nan", hdop="nan", 
+                        satellites_tracked="nan", height="nan", age="nan", 
+                        gps_time=None, fix_quality=1):
+        """Create GNSS format line from GPS data.
         
-        # Build RMC sentence (without checksum)
-        sentence_data = [
-            "GPRMC",
-            time_str,
-            status,
-            lat_str,
-            lat_dir,
-            lon_str,
-            lon_dir,
-            f"{speed:.1f}",
-            f"{course:.1f}",
-            date_str,
-            "",  # Magnetic variation
-            ""   # Magnetic variation direction
+        Format: timestamp lat lon alt hdop satellites_tracked height age time fix_quality additional_timestamp
+        """
+        # Convert timestamp to seconds for GPS time calculation
+        ros_time = timestamp_ns / 1e9
+        
+        # Generate GPS time if not provided
+        if gps_time is None:
+            gps_time = GNSSFormatter.ros_time_to_gps_time(ros_time)
+        
+        # Generate millisecond timestamp for column 11
+        timestamp_ms = GNSSFormatter.timestamp_ns_to_ms(timestamp_ns)
+        
+        # Format the line with all 11 columns
+        gnss_data = [
+            str(timestamp_ns),           # Column 1: timestamp (nanoseconds)
+            str(latitude),               # Column 2: lat (decimal degrees)
+            str(longitude),              # Column 3: lon (decimal degrees)
+            str(altitude),               # Column 4: alt (meters)
+            str(hdop),                   # Column 5: hdop (Horizontal Dilution of Precision)
+            str(satellites_tracked),     # Column 6: satellites_tracked
+            str(height),                 # Column 7: height (geoidal separation)
+            str(age),                    # Column 8: age (DGPS data age)
+            str(gps_time),               # Column 9: time (GPS time H:M:S)
+            str(fix_quality),            # Column 10: fix_quality
+            str(timestamp_ms)            # Column 11: additional timestamp (milliseconds)
         ]
         
-        sentence_without_prefix = ",".join(sentence_data)
-        sentence = "$" + sentence_without_prefix
-        checksum = NMEAFormatter.calculate_checksum(sentence)
-        return f"{sentence}*{checksum}"
+        return " ".join(gnss_data)
 
 
-class BagToNMEAConverter:
+class BagToGNSSConverter:
     """Main converter class for processing ROS1 bag files."""
     
-    def __init__(self, bag_path, output_path=None):
+    def __init__(self, bag_path, output_path=None, chunked=False, chunk_duration=20.0):
         self.bag_path = Path(bag_path)
-        if output_path:
-            self.output_path = Path(output_path)
+        self.chunked = chunked
+        self.chunk_duration = chunk_duration
+        
+        if chunked:
+            # For chunked output, output_path should be a directory
+            if output_path:
+                self.output_dir = Path(output_path)
+            else:
+                # Default output directory based on input bag filename
+                self.output_dir = self.bag_path.parent / f"{self.bag_path.stem}_gnss_chunks"
+            
+            # Ensure output directory exists
+            self.output_dir.mkdir(exist_ok=True)
+            self.output_path = None  # Will be set per chunk
         else:
-            # Default output filename based on input bag filename
-            self.output_path = self.bag_path.with_suffix('.nmea')
+            # For single file output
+            if output_path:
+                self.output_path = Path(output_path)
+            else:
+                # Default output filename based on input bag filename
+                self.output_path = self.bag_path.with_suffix('.gnss')
+            self.output_dir = None
         
         self.message_count = 0
         self.processed_count = 0
+        
+        # Chunking state
+        self.current_chunk_start = None
+        self.current_chunk_file = None
+        self.chunk_counter = 0
     
     def parse_custom_gps_message(self, rawdata):
         """Parse the custom rshandheld_location/msg/GpsRmc message format."""
@@ -244,9 +246,50 @@ class BagToNMEAConverter:
         
         return True
     
-    def convert_to_nmea(self):
-        """Convert GPS messages from bag file to NMEA format."""
-        print(f"Converting {self.bag_path} to NMEA format...")
+    def _should_start_new_chunk(self, timestamp):
+        """Check if a new chunk should be started based on timestamp."""
+        if self.current_chunk_start is None:
+            return True
+        
+        # Convert timestamp from nanoseconds to seconds
+        timestamp_s = timestamp / 1e9
+        chunk_start_s = self.current_chunk_start / 1e9
+        
+        return (timestamp_s - chunk_start_s) > self.chunk_duration
+    
+    def _start_new_chunk(self, timestamp):
+        """Start a new chunk file."""
+        # Close previous chunk file if open
+        if self.current_chunk_file:
+            self.current_chunk_file.close()
+        
+        # Create new chunk filename
+        chunk_filename = f"gnss{self.chunk_counter:04d}.gnss"
+        chunk_path = self.output_dir / chunk_filename
+        
+        # Open new chunk file
+        self.current_chunk_file = open(chunk_path, 'w')
+        self.current_chunk_start = timestamp
+        
+        print(f"Started chunk {self.chunk_counter}: {chunk_filename}")
+        self.chunk_counter += 1
+    
+    def _close_current_chunk(self):
+        """Close the current chunk file."""
+        if self.current_chunk_file:
+            self.current_chunk_file.close()
+            self.current_chunk_file = None
+    
+    def convert_to_gnss(self):
+        """Convert GPS messages from bag file to GNSS format."""
+        if self.chunked:
+            return self._convert_to_gnss_chunked()
+        else:
+            return self._convert_to_gnss_single()
+    
+    def _convert_to_gnss_single(self):
+        """Convert GPS messages to a single GNSS file."""
+        print(f"Converting {self.bag_path} to GNSS format...")
         print(f"Output file: {self.output_path}")
         
         try:
@@ -262,11 +305,12 @@ class BagToNMEAConverter:
                                 gps_data = self.parse_custom_gps_message(rawdata)
                                 
                                 if gps_data:
-                                    # Extract GPS data and format as NMEA
-                                    nmea_sentence = self._extract_and_format_gps_data(gps_data, timestamp)
+                                    # Extract GPS data and format as GNSS
+                                    gnss_line = self._extract_and_format_gnss_data(gps_data, timestamp)
                                     
-                                    if nmea_sentence:
-                                        output_file.write(nmea_sentence + '\n')
+                                    if gnss_line:
+                                        # Write GNSS format line
+                                        output_file.write(f"{gnss_line}\n")
                                         self.processed_count += 1
                                         
                                         if self.processed_count % 50 == 0:
@@ -282,6 +326,7 @@ class BagToNMEAConverter:
                     print(f"Total messages found: {self.message_count}")
                     print(f"Successfully processed: {self.processed_count}")
                     print(f"Output saved to: {self.output_path}")
+                    print(f"Format: Each line contains 11 space-separated columns as expected by HD Mapping")
                     
         except Exception as e:
             print(f"Error during conversion: {e}")
@@ -289,48 +334,125 @@ class BagToNMEAConverter:
         
         return True
     
-    def _extract_and_format_gps_data(self, gps_data, timestamp):
-        """Extract GPS data from parsed message and format as NMEA RMC."""
+    def _convert_to_gnss_chunked(self):
+        """Convert GPS messages to chunked GNSS files."""
+        print(f"Converting {self.bag_path} to chunked GNSS format...")
+        print(f"Output directory: {self.output_dir}")
+        print(f"Chunk duration: {self.chunk_duration} seconds")
+        
         try:
-            # Convert ROS timestamp (nanoseconds) to seconds
-            ros_time = timestamp / 1e9
+            with Reader(str(self.bag_path)) as reader:
+                
+                for connection, timestamp, rawdata in reader.messages():
+                    if connection.topic == '/GPSRMC':
+                        self.message_count += 1
+                        
+                        try:
+                            # Parse the custom GPS message format
+                            gps_data = self.parse_custom_gps_message(rawdata)
+                            
+                            if gps_data:
+                                # Check if we need to start a new chunk
+                                if self._should_start_new_chunk(timestamp):
+                                    self._start_new_chunk(timestamp)
+                                
+                                # Extract GPS data and format as GNSS
+                                gnss_line = self._extract_and_format_gnss_data(gps_data, timestamp)
+                                
+                                if gnss_line:
+                                    # Write GNSS format line
+                                    self.current_chunk_file.write(f"{gnss_line}\n")
+                                    self.processed_count += 1
+                                    
+                                    if self.processed_count % 50 == 0:
+                                        print(f"Processed {self.processed_count} messages...")
+                            else:
+                                print(f"Failed to parse message {self.message_count}")
+                                    
+                        except Exception as e:
+                            print(f"Error processing message {self.message_count}: {e}")
+                            continue
+                
+                # Close the last chunk file
+                self._close_current_chunk()
+                
+                print(f"\nChunked conversion complete!")
+                print(f"Total messages found: {self.message_count}")
+                print(f"Successfully processed: {self.processed_count}")
+                print(f"Created {self.chunk_counter} chunk files in: {self.output_dir}")
+                print(f"Format: Each line contains 11 space-separated columns as expected by HD Mapping")
+                    
+        except Exception as e:
+            print(f"Error during conversion: {e}")
+            # Make sure to close any open chunk file
+            self._close_current_chunk()
+            return False
+        
+        return True
+    
+    def _extract_and_format_gnss_data(self, gps_data, timestamp):
+        """Extract GPS data from parsed message and format as GNSS raw data."""
+        try:
+            # Use ROS timestamp in nanoseconds
+            timestamp_ns = int(timestamp)
             
             # Extract coordinates from parsed GPS data
             latitude = gps_data['latitude']
             longitude = gps_data['longitude']
-            speed = gps_data['speed']
-            course = gps_data['course']
-            status = gps_data['status']
             
-            # Create NMEA RMC sentence
-            nmea_sentence = NMEAFormatter.create_rmc_sentence(
-                ros_time, latitude, longitude, speed, course, status
+            # Determine fix quality based on status
+            fix_quality = 1 if gps_data['status'] == 'A' else 0
+            
+            # Create GNSS format line using the formatter
+            gnss_line = GNSSFormatter.create_gnss_line(
+                timestamp_ns=timestamp_ns,
+                latitude=latitude,
+                longitude=longitude,
+                altitude="nan",  # Not available in current data
+                hdop="nan",      # Not available in current data
+                satellites_tracked="nan",  # Not available in current data
+                height="nan",    # Not available in current data
+                age="nan",       # Not available in current data
+                gps_time=None,   # Will be generated from timestamp
+                fix_quality=fix_quality
             )
             
-            return nmea_sentence
+            return gnss_line
             
         except Exception as e:
-            print(f"Error extracting GPS data: {e}")
+            print(f"Error extracting GNSS data: {e}")
             return None
 
 
 def main():
     """Main function with command line interface."""
     parser = argparse.ArgumentParser(
-        description='Convert ROS1 bag GPS data to NMEA format',
+        description='Convert ROS1 bag GPS data to GNSS format',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+  # Single file output (default)
   python bag_to_nmea.py GPS_sample.bag
-  python bag_to_nmea.py GPS_sample.bag --output custom_output.nmea
+  python bag_to_nmea.py GPS_sample.bag --output custom_output.gnss
+  
+  # Chunked output for HD Mapping compatibility
+  python bag_to_nmea.py GPS_sample.bag --chunked
+  python bag_to_nmea.py GPS_sample.bag --chunked --output ./gnss_chunks --chunk-duration 30
+  
+  # Inspect bag structure
   python bag_to_nmea.py GPS_sample.bag --inspect
         """
     )
     
     parser.add_argument('bag_file', help='Path to the ROS1 bag file')
-    parser.add_argument('--output', '-o', help='Output NMEA file path (default: input_name.nmea)')
+    parser.add_argument('--output', '-o', 
+                       help='Output path: file for single mode, directory for chunked mode (default: auto-generated)')
     parser.add_argument('--inspect', '-i', action='store_true', 
                        help='Inspect bag file structure without conversion')
+    parser.add_argument('--chunked', '-c', action='store_true',
+                       help='Output chunked GNSS files for HD Mapping compatibility')
+    parser.add_argument('--chunk-duration', '-d', type=float, default=20.0,
+                       help='Duration of each chunk in seconds (default: 20.0, matching lidar tool)')
     
     args = parser.parse_args()
     
@@ -339,8 +461,18 @@ Examples:
         print(f"Error: Bag file '{args.bag_file}' not found.")
         sys.exit(1)
     
+    # Validate chunk duration
+    if args.chunk_duration <= 0:
+        print(f"Error: Chunk duration must be positive, got {args.chunk_duration}")
+        sys.exit(1)
+    
     # Create converter
-    converter = BagToNMEAConverter(args.bag_file, args.output)
+    converter = BagToGNSSConverter(
+        args.bag_file, 
+        args.output, 
+        chunked=args.chunked, 
+        chunk_duration=args.chunk_duration
+    )
     
     if args.inspect:
         # Just inspect the bag structure
@@ -348,7 +480,7 @@ Examples:
     else:
         # First inspect to understand structure, then convert
         if converter.inspect_bag_structure():
-            converter.convert_to_nmea()
+            converter.convert_to_gnss()
         else:
             print("Failed to inspect bag file structure.")
             sys.exit(1)

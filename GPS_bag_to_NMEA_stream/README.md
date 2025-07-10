@@ -35,15 +35,41 @@ The script successfully converts custom GPS message format (`rshandheld_location
 
 ### Usage
 ```bash
-# Basic conversion
+# Basic conversion (single file output)
 python3 bag_to_nmea.py GPS_sample.bag
 
-# Custom output
+# Custom output file
 python3 bag_to_nmea.py GPS_sample.bag --output my_data.nmea
+
+# Chunked output for HD Mapping compatibility
+python3 bag_to_nmea.py GPS_sample.bag --chunked
+
+# Chunked output with custom directory and duration
+python3 bag_to_nmea.py GPS_sample.bag --chunked --output ./nmea_chunks --chunk-duration 30
 
 # Inspect bag structure
 python3 bag_to_nmea.py GPS_sample.bag --inspect
 ```
+
+### Output Modes
+
+#### Single File Mode (Default)
+- Outputs all NMEA data to a single `.nmea` file
+- Compatible with most GIS software and general NMEA applications
+- Format: `<timestamp_ns> <NMEA_sentence>` per line
+
+#### Chunked Mode (HD Mapping Compatible)
+- Splits NMEA data into time-based chunks (default: 20 seconds)
+- Creates multiple files: `nmea_0000.nmea`, `nmea_0001.nmea`, etc.
+- Designed for HD Mapping tool compatibility
+- Temporal alignment with lidar data chunks
+- Use `--chunked` flag to enable
+
+### Command Line Options
+- `--output, -o`: Output path (file for single mode, directory for chunked mode)
+- `--chunked, -c`: Enable chunked output mode
+- `--chunk-duration, -d`: Duration of each chunk in seconds (default: 20.0)
+- `--inspect, -i`: Inspect bag file structure without conversion
 
 ### Test Results
 Successfully processed the sample bag file:

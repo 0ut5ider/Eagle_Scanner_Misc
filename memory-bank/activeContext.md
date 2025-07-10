@@ -1,29 +1,36 @@
 # Active Context: GPS Bag to NMEA Converter
 
 ## Current Work Focus
-Just completed implementation of a ROS1 bag to NMEA converter for the Eagle Scanner project. The tool successfully converts GPS data from custom ROS1 message format to standard NMEA format without requiring ROS1 installation.
+Enhanced the ROS1 bag to NMEA converter with chunking functionality for HD Mapping compatibility. The tool now supports both single file output and time-based chunked output to match HD Mapping's expected input format.
 
 ## Recent Changes
-1. **Created `GPS_bag_to_NMEA_stream/bag_to_nmea.py`** - Main converter script with:
-   - Custom binary message parser for `rshandheld_location/GpsRmc` format
-   - NMEA RMC sentence formatter with proper checksums
-   - Command line interface with inspect and conversion modes
-   - Error handling and progress reporting
+1. **Enhanced `GPS_bag_to_NMEA_stream/bag_to_nmea.py`** - Added chunking functionality:
+   - **Chunked output mode**: Splits NMEA data into time-based chunks (default: 20 seconds)
+   - **HD Mapping compatibility**: Matches lidar tool chunking strategy for temporal alignment
+   - **Flexible output**: Command line option to choose between single file or chunked output
+   - **Sequential naming**: Creates `nmea_0000.nmea`, `nmea_0001.nmea`, etc.
+   - **Backward compatibility**: Maintains existing single file output as default
 
-2. **Supporting Files Created**:
-   - `requirements.txt` - rosbags dependency
-   - `usage_example.md` - Comprehensive usage documentation
-   - Updated `README.md` with implementation summary
+2. **New Command Line Options**:
+   - `--chunked, -c`: Enable chunked output mode
+   - `--chunk-duration, -d`: Configurable chunk duration (default: 20.0 seconds)
+   - Enhanced `--output` parameter to handle both file and directory paths
 
-3. **Test Results**:
-   - Successfully processed GPS_sample.bag (486 messages)
-   - Generated GPS_sample.nmea with valid NMEA sentences
-   - All coordinates and timing preserved accurately
+3. **Updated Documentation**:
+   - Enhanced `README.md` with chunking mode documentation
+   - Added usage examples for both output modes
+   - Documented HD Mapping compatibility features
+
+4. **Implementation Details**:
+   - Time-based chunking logic similar to `rosbag1_to_mandeye_node.cpp`
+   - Proper file handling with automatic directory creation
+   - Error handling for chunk file operations
+   - Progress reporting for chunked conversion
 
 ## Next Steps
-- Memory bank initialization completed
-- Project is ready for future GPS processing tasks
-- Consider extending to support other NMEA sentence types (GGA, GSA, etc.)
+- Test chunking functionality with HD Mapping tool
+- Verify temporal alignment with lidar chunks
+- Consider adding chunk size validation
 - Potential integration with existing trajectory processing tools
 
 ## Active Decisions and Considerations
