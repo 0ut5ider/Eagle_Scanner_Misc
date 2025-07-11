@@ -3,7 +3,7 @@ Various pieces of code, instructions and workflows for making life simpler when 
 
 ### [GPS Bag to GNSS Converter](https://github.com/0ut5ider/Eagle_Scanner_Misc/tree/main/GPS_bag_to_GNSS)
 
-Python script to convert ROS1 bag files containing GPS data into GNSS format without requiring ROS1 installation. Handles custom message types and generates GNSS raw format with 11 space-separated columns.
+Python script to convert ROS1 bag files containing GPS data into GNSS format without requiring ROS1 installation. Handles custom message types and generates GNSS raw format.
 
 **Features:**
 - No ROS1 dependency (uses rosbags library)

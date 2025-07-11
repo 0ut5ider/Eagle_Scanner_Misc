@@ -91,11 +91,6 @@ Trajectory CSV → Pandas DataFrame → Interpolation → Image Timestamps → P
 - **Implementation**: Apply direction indicators (N/S, E/W) to coordinate signs
 - **Format**: Convert decimal degrees to NMEA degrees/minutes format
 
-### 3. NMEA Compliance
-- **Standard**: Generate valid NMEA RMC sentences
-- **Checksum**: XOR calculation excluding '$' and '*'
-- **Format**: `$GPRMC,time,status,lat,lat_dir,lon,lon_dir,speed,course,date,,*checksum`
-
 ## Error Handling Patterns
 - Graceful degradation for parsing errors
 - Informative error messages for debugging
