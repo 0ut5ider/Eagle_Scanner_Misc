@@ -11,11 +11,11 @@ The script successfully converts custom GPS message format (`rshandheld_location
 - **No ROS1 dependency** - Uses rosbags library for parsing
 - **Custom message parser** - Handles binary message format with custom structure
 - **GNSS raw output** - Generates space-separated GNSS data format
-- **Coordinate preservation** - Maintains original coordinate system
+- **Coordinate preservation** - Maintains original coordinate values from GPS data
 - **HD Mapping compatibility** - Chunked output with proper filename format
 
 ### Files Created
-- `bag_to_nmea.py` - Main converter script
+- `bag_to_gnss.py` - Main converter script
 - `requirements.txt` - Dependencies
 - `usage_example.md` - Usage documentation
 - `GPS_sample.gnss` - Test output (486 GNSS data lines)
@@ -23,19 +23,19 @@ The script successfully converts custom GPS message format (`rshandheld_location
 ### Usage
 ```bash
 # Basic conversion (single file output)
-python3 bag_to_nmea.py GPS_sample.bag
+python3 bag_to_gnss.py GPS_sample.bag
 
 # Custom output file
-python3 bag_to_nmea.py GPS_sample.bag --output my_data.gnss
+python3 bag_to_gnss.py GPS_sample.bag --output my_data.gnss
 
 # Chunked output for HD Mapping compatibility
-python3 bag_to_nmea.py GPS_sample.bag --chunked
+python3 bag_to_gnss.py GPS_sample.bag --chunked
 
 # Chunked output with custom directory and duration
-python3 bag_to_nmea.py GPS_sample.bag --chunked --output ./gnss_chunks --chunk-duration 30
+python3 bag_to_gnss.py GPS_sample.bag --chunked --output ./gnss_chunks --chunk-duration 30
 
 # Inspect bag structure
-python3 bag_to_nmea.py GPS_sample.bag --inspect
+python3 bag_to_gnss.py GPS_sample.bag --inspect
 ```
 
 ### Output Modes
@@ -57,3 +57,21 @@ python3 bag_to_nmea.py GPS_sample.bag --inspect
 - `--chunk-duration, -d`: Duration of each chunk in seconds (default: 20.0)
 - `--inspect, -i`: Inspect bag file structure without conversion
 
+### Coordinate Handling
+
+The converter preserves the original coordinate values from the GPS data:
+
+#### Direction Indicators
+GPS messages contain direction indicator fields ('N'/'S' for latitude, 'E'/'W' for longitude) that should determine coordinate signs. However, in the current dataset, these direction indicators are empty.
+
+#### Current Behavior
+- **Latitude**: Preserved as positive values (North)
+- **Longitude**: Preserved as positive values (as found in source data)
+- **Example Output**: `43.599 79.554` (original values maintained)
+
+#### Optional Corrections
+The code includes commented-out logic for:
+1. **Direction Indicator Processing** - Would apply negative signs based on 'S' and 'W' indicators if they were populated
+2. **Geographic Validation** - Would automatically correct longitude signs for North American coordinates
+
+These can be uncommented if coordinate correction is needed for specific use cases.

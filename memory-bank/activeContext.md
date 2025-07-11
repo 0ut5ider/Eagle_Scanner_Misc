@@ -1,33 +1,32 @@
-# Active Context: RTK to GNSS Converter
+# Active Context: GPS Bag to GNSS Converter - Longitude Sign Investigation
 
 ## Current Work Focus
-Created a new RTK to GNSS converter tool that processes RTKLIB rnx2rtkp output (solution.pos format) and converts it to a custom 11-column GNSS format. This tool complements the existing GPS processing capabilities in the Eagle Scanner project.
+Investigated and resolved longitude sign issues in the GPS bag to GNSS converter. The converter was outputting positive longitude values when they should be negative for North American coordinates (Toronto area). After analysis, implemented and then commented out coordinate correction logic to preserve original data integrity.
 
 ## Recent Changes
-1. **New `RTK/rtk_to_gnss.py`** - Complete RTKLIB converter implementation:
-   - **RTKLIB Integration**: Processes solution.pos files from rnx2rtkp program
-   - **Timestamp Conversion**: Converts GPST format to Unix epoch (nanoseconds and milliseconds)
-   - **11-Column Output**: Generates space-separated GNSS format with all required fields
-   - **Data Mapping**: Maps available fields, uses 'nan' for unavailable data (HDOP, geoidal separation)
-   - **Robust Parsing**: Handles header comments and malformed lines gracefully
-   - **Progress Reporting**: Shows conversion progress for large files
+1. **Longitude Sign Investigation** - `GPS_bag_to_GNSS/bag_to_gnss.py`:
+   - **Problem Identified**: Longitude values showing as positive (+79.55) instead of negative (-79.55) for Toronto area
+   - **Root Cause**: Direction indicator fields ('E'/'W') were empty in GPS data, so existing logic wasn't applying negative signs
+   - **Solution Implemented**: Added geographic validation logic to automatically correct longitude signs for North American coordinates
+   - **Final Decision**: Commented out both direction indicator logic and geographic correction to preserve original data integrity
+   - **Documentation Updated**: README.md updated to reflect coordinate handling behavior
 
-2. **Command Line Interface**:
-   - `input_file`: Required solution.pos file from RTKLIB rnx2rtkp
-   - `--output, -o`: Optional output .gnss file (default: input_name.gnss)
-   - `--help`: Comprehensive help with usage examples and field descriptions
+2. **Code Changes Made**:
+   - **Direction Indicator Logic**: Commented out with explanation that GPS data has empty direction indicators
+   - **Geographic Validation**: Commented out automatic correction logic with detailed explanation
+   - **Comprehensive Comments**: Added clear documentation about when and why to uncomment each section
+   - **Testing Verified**: Confirmed converter now preserves original coordinate values as found in source data
 
-3. **Updated Documentation**:
-   - Complete `RTK/README.md` with usage examples and field mapping table
-   - Detailed column descriptions with source field mapping
-   - Example output format and feature documentation
+3. **Documentation Updates**:
+   - **README.md**: Updated coordinate handling section to explain current behavior
+   - **Removed Outdated Info**: Removed geographic correction documentation since feature is commented out
+   - **Added Optional Corrections**: Documented that correction logic exists but is disabled by default
 
-4. **Implementation Details**:
-   - GPST timestamp parsing with datetime conversion
-   - Unix epoch conversion to nanoseconds and milliseconds
-   - Field extraction from solution.pos format
-   - Error handling for parsing failures and missing data
-   - Automatic .gnss extension handling
+4. **Investigation Process**:
+   - **Data Analysis**: Examined GPS message structure and found empty direction indicator fields
+   - **Geographic Logic**: Implemented North American coordinate detection and correction
+   - **User Feedback**: Based on user input, commented out correction logic to preserve original values
+   - **Testing**: Verified both corrected and original coordinate outputs work correctly
 
 ## Next Steps
 - Tool is complete and ready for operational use

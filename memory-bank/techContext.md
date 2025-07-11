@@ -32,35 +32,36 @@
 - **Strings**: Length-prefixed with null terminators
 - **Floats**: IEEE 754 double precision (8 bytes)
 
-### NMEA Standard Compliance
-- **Format**: NMEA 0183 standard for GPS sentences
-- **Checksum**: XOR calculation for data integrity
-- **Coordinate Format**: Degrees and decimal minutes (DDMM.MMMM)
+### GNSS Format Compliance
+- **Format**: 11-column space-separated GNSS format for HD Mapping compatibility
+- **Timestamp**: Nanosecond and millisecond Unix epoch timestamps
+- **Coordinate Format**: Decimal degrees (DD.DDDDDD)
+- **Missing Data**: 'nan' values for unavailable fields
 
 ## Tool Usage Patterns
 
 ### Command Line Tools
 ```bash
 # Basic conversion
-python3 bag_to_nmea.py input.bag
+python3 bag_to_gnss.py input.bag
 
 # Custom output
-python3 bag_to_nmea.py input.bag --output output.nmea
+python3 bag_to_gnss.py input.bag --output output.gnss
 
 # Inspection mode
-python3 bag_to_nmea.py input.bag --inspect
+python3 bag_to_gnss.py input.bag --inspect
 ```
 
 ### Python Module Usage
 ```python
-from bag_to_nmea import NMEAFormatter, BagToNMEAConverter
+from bag_to_gnss import GNSSFormatter, BagToGNSSConverter
 
-# Direct NMEA formatting
-sentence = NMEAFormatter.create_rmc_sentence(timestamp, lat, lon, speed, course)
+# Direct GNSS formatting
+gnss_line = GNSSFormatter.create_gnss_line(timestamp_ns, lat, lon, alt, hdop, satellites, height, age, gps_time, fix_quality)
 
 # Bag conversion
-converter = BagToNMEAConverter('input.bag', 'output.nmea')
-converter.convert_to_nmea()
+converter = BagToGNSSConverter('input.bag', 'output.gnss')
+converter.convert_to_gnss()
 ```
 
 ## Data Formats
@@ -88,10 +89,11 @@ string mode          # Positioning mode (N/A/D)
 string navStates     # Navigation status (fixed 'V')
 ```
 
-### Output: NMEA RMC Format
+### Output: GNSS Format (11 columns)
 ```
-$GPRMC,time,status,lat,lat_dir,lon,lon_dir,speed,course,date,mag_var,mag_var_dir*checksum
+timestamp_ns lat lon alt hdop satellites_tracked height age time fix_quality timestamp_ms
 ```
+**Example**: `1746987745017110387 43.59990111233333 79.55422270483334 nan nan nan nan nan 18:22:25 0 1746987745017`
 
 ## Performance Characteristics
 - **Processing Speed**: ~486 messages in <5 seconds

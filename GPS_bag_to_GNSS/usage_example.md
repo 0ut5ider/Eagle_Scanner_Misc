@@ -4,7 +4,7 @@
 
 Convert a ROS1 bag file to GNSS format:
 ```bash
-python3 bag_to_nmea.py GPS_sample.bag
+python3 bag_to_gnss.py GPS_sample.bag
 ```
 
 This will create `GPS_sample.gnss` with all GPS messages converted to GNSS raw format.
@@ -13,28 +13,28 @@ This will create `GPS_sample.gnss` with all GPS messages converted to GNSS raw f
 
 Specify a custom output filename:
 ```bash
-python3 bag_to_nmea.py GPS_sample.bag --output my_gps_data.gnss
+python3 bag_to_gnss.py GPS_sample.bag --output my_gps_data.gnss
 ```
 
 ## Chunked Output for HD Mapping
 
 Generate chunked GNSS files for HD Mapping compatibility:
 ```bash
-python3 bag_to_nmea.py GPS_sample.bag --chunked
+python3 bag_to_gnss.py GPS_sample.bag --chunked
 ```
 
 This creates a directory with multiple files: `gnss0000.gnss`, `gnss0001.gnss`, etc.
 
 Custom chunk settings:
 ```bash
-python3 bag_to_nmea.py GPS_sample.bag --chunked --output ./gnss_chunks --chunk-duration 30
+python3 bag_to_gnss.py GPS_sample.bag --chunked --output ./gnss_chunks --chunk-duration 30
 ```
 
 ## Inspect Bag File Structure
 
 To inspect the bag file without converting:
 ```bash
-python3 bag_to_nmea.py GPS_sample.bag --inspect
+python3 bag_to_gnss.py GPS_sample.bag --inspect
 ```
 
 ## Output Format

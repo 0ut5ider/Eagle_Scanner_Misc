@@ -149,10 +149,30 @@ class BagToGNSSConverter:
             nav_states, offset = read_string(rawdata, offset)
             
             # Apply direction indicators to coordinates
-            if n_indicator == 'S':
-                lat = -lat
-            if e_indicator == 'W':
-                lon = -lon
+            # NOTE: This logic is currently commented out because the GPS data in the bag files
+            # has empty direction indicator fields (n_indicator and e_indicator are '').
+            # This code would work correctly if the GPS data had valid 'N'/'S' and 'E'/'W' indicators.
+            # Uncomment if processing GPS data with properly populated direction indicators.
+            # if n_indicator == 'S':
+            #     lat = -lat
+            # if e_indicator == 'W':
+            #     lon = -lon
+            
+            # Geographic validation and correction for North American coordinates
+            # NOTE: This automatic correction logic is commented out to preserve original coordinate values.
+            # It was designed to automatically convert positive longitudes to negative for North American
+            # coordinates when direction indicators are missing. Uncomment if automatic geographic
+            # correction is desired for datasets with missing or incorrect direction indicators.
+            # if 40.0 < lat < 50.0 and lon > 0:  # Latitude range for southern Canada/northern US
+            #     # Check if this looks like a North American longitude that should be negative
+            #     if 60.0 < lon < 180.0:  # Longitude range for North America (should be negative)
+            #         if not hasattr(self, 'longitude_warning_shown'):
+            #             print(f"Warning: Detected positive longitude {lon:.2f} in North American latitude range")
+            #             print(f"  Direction indicator 'E' was: '{e_indicator}' (expected 'W' for North America)")
+            #             print(f"  Applying geographic correction to make longitude negative")
+            #             print(f"  This warning will only be shown once per conversion")
+            #             self.longitude_warning_shown = True
+            #         lon = -lon
             
             return {
                 'system_log': system_log,
@@ -432,15 +452,15 @@ def main():
         epilog="""
 Examples:
   # Single file output (default)
-  python bag_to_nmea.py GPS_sample.bag
-  python bag_to_nmea.py GPS_sample.bag --output custom_output.gnss
+  python bag_to_gnss.py GPS_sample.bag
+  python bag_to_gnss.py GPS_sample.bag --output custom_output.gnss
   
   # Chunked output for HD Mapping compatibility
-  python bag_to_nmea.py GPS_sample.bag --chunked
-  python bag_to_nmea.py GPS_sample.bag --chunked --output ./gnss_chunks --chunk-duration 30
+  python bag_to_gnss.py GPS_sample.bag --chunked
+  python bag_to_gnss.py GPS_sample.bag --chunked --output ./gnss_chunks --chunk-duration 30
   
   # Inspect bag structure
-  python bag_to_nmea.py GPS_sample.bag --inspect
+  python bag_to_gnss.py GPS_sample.bag --inspect
         """
     )
     

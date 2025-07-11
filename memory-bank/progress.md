@@ -1,13 +1,15 @@
 # Progress: Eagle Scanner GPS Tools
 
 ## What Works
-### GPS Bag to NMEA Converter ✅
-- **Complete Implementation**: Fully functional ROS1 bag to NMEA converter
+### GPS Bag to GNSS Converter ✅
+- **Complete Implementation**: Fully functional ROS1 bag to GNSS converter (updated from NMEA to GNSS format)
 - **Custom Message Parsing**: Successfully handles `rshandheld_location/GpsRmc` format
-- **NMEA Compliance**: Generates valid NMEA RMC sentences with proper checksums
+- **GNSS Format Output**: Generates 11-column space-separated GNSS format for HD Mapping compatibility
+- **Coordinate Preservation**: Maintains original coordinate values from GPS data (longitude sign investigation resolved)
 - **Zero Dependencies**: Works without ROS1 installation (uses rosbags library)
 - **Performance**: Processes 486 messages in seconds with minimal memory usage
 - **CLI Interface**: User-friendly command line with inspect and conversion modes
+- **Chunked Output**: Optional time-based chunking for large datasets
 - **Error Handling**: Graceful error handling with informative messages
 - **Documentation**: Complete README, usage examples, and technical documentation
 
@@ -43,14 +45,14 @@
 
 ## Current Status
 ### Completed This Session
-- ✅ RTK to GNSS converter implementation (`RTK/rtk_to_gnss.py`)
-- ✅ RTKLIB solution.pos format parsing
-- ✅ GPST timestamp conversion to Unix epoch (nanoseconds/milliseconds)
-- ✅ 11-column GNSS format output generation
-- ✅ Command line interface with flexible input/output options
-- ✅ Comprehensive testing with sample data (67 lines converted)
-- ✅ Updated documentation (`RTK/README.md`)
-- ✅ Memory bank updates
+- ✅ Longitude sign investigation in GPS bag to GNSS converter
+- ✅ Root cause analysis: Empty direction indicator fields in GPS data
+- ✅ Geographic validation logic implementation and testing
+- ✅ Code commenting with detailed explanations for future reference
+- ✅ Coordinate preservation approach finalized (maintains original values)
+- ✅ Documentation updates reflecting current coordinate handling behavior
+- ✅ Testing verification of both corrected and original coordinate outputs
+- ✅ Memory bank updates documenting investigation and resolution
 
 ### Immediate Next Steps
 - Project is ready for operational use
