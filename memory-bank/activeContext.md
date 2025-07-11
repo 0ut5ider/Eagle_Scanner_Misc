@@ -1,64 +1,69 @@
-# Active Context: GPS Bag to NMEA Converter
+# Active Context: RTK to GNSS Converter
 
 ## Current Work Focus
-Enhanced the ROS1 bag to NMEA converter with chunking functionality for HD Mapping compatibility. The tool now supports both single file output and time-based chunked output to match HD Mapping's expected input format.
+Created a new RTK to GNSS converter tool that processes RTKLIB rnx2rtkp output (solution.pos format) and converts it to a custom 11-column GNSS format. This tool complements the existing GPS processing capabilities in the Eagle Scanner project.
 
 ## Recent Changes
-1. **Enhanced `GPS_bag_to_NMEA_stream/bag_to_nmea.py`** - Added chunking functionality:
-   - **Chunked output mode**: Splits NMEA data into time-based chunks (default: 20 seconds)
-   - **HD Mapping compatibility**: Matches lidar tool chunking strategy for temporal alignment
-   - **Flexible output**: Command line option to choose between single file or chunked output
-   - **Sequential naming**: Creates `nmea_0000.nmea`, `nmea_0001.nmea`, etc.
-   - **Backward compatibility**: Maintains existing single file output as default
+1. **New `RTK/rtk_to_gnss.py`** - Complete RTKLIB converter implementation:
+   - **RTKLIB Integration**: Processes solution.pos files from rnx2rtkp program
+   - **Timestamp Conversion**: Converts GPST format to Unix epoch (nanoseconds and milliseconds)
+   - **11-Column Output**: Generates space-separated GNSS format with all required fields
+   - **Data Mapping**: Maps available fields, uses 'nan' for unavailable data (HDOP, geoidal separation)
+   - **Robust Parsing**: Handles header comments and malformed lines gracefully
+   - **Progress Reporting**: Shows conversion progress for large files
 
-2. **New Command Line Options**:
-   - `--chunked, -c`: Enable chunked output mode
-   - `--chunk-duration, -d`: Configurable chunk duration (default: 20.0 seconds)
-   - Enhanced `--output` parameter to handle both file and directory paths
+2. **Command Line Interface**:
+   - `input_file`: Required solution.pos file from RTKLIB rnx2rtkp
+   - `--output, -o`: Optional output .gnss file (default: input_name.gnss)
+   - `--help`: Comprehensive help with usage examples and field descriptions
 
 3. **Updated Documentation**:
-   - Enhanced `README.md` with chunking mode documentation
-   - Added usage examples for both output modes
-   - Documented HD Mapping compatibility features
+   - Complete `RTK/README.md` with usage examples and field mapping table
+   - Detailed column descriptions with source field mapping
+   - Example output format and feature documentation
 
 4. **Implementation Details**:
-   - Time-based chunking logic similar to `rosbag1_to_mandeye_node.cpp`
-   - Proper file handling with automatic directory creation
-   - Error handling for chunk file operations
-   - Progress reporting for chunked conversion
+   - GPST timestamp parsing with datetime conversion
+   - Unix epoch conversion to nanoseconds and milliseconds
+   - Field extraction from solution.pos format
+   - Error handling for parsing failures and missing data
+   - Automatic .gnss extension handling
 
 ## Next Steps
-- Test chunking functionality with HD Mapping tool
-- Verify temporal alignment with lidar chunks
-- Consider adding chunk size validation
-- Potential integration with existing trajectory processing tools
+- Tool is complete and ready for operational use
+- Consider integration with existing trajectory processing workflows
+- Monitor for user feedback and potential enhancements
+- Potential batch processing capabilities for multiple files
 
 ## Active Decisions and Considerations
-- **Custom Parser Approach**: Chose raw binary parsing over attempting to register custom message types with rosbags
-- **NMEA RMC Focus**: Started with RMC sentences as they contain the core GPS data (position, speed, course, time)
-- **Standalone Design**: Prioritized zero ROS1 dependency for operational simplicity
-- **Stream Processing**: Used iterator pattern for memory-efficient processing of large bag files
+- **RTKLIB Format Parsing**: Chose line-by-line parsing with field splitting for solution.pos format
+- **Timestamp Strategy**: Convert GPST to Unix epoch for compatibility with other tools
+- **Missing Data Handling**: Use 'nan' for unavailable fields rather than empty strings or zeros
+- **Standalone Design**: Prioritized minimal dependencies (only standard Python libraries)
+- **Field Mapping**: Direct mapping where possible, calculated conversions for timestamps
 
 ## Important Patterns and Preferences
-- **Error Handling**: Graceful degradation with informative error messages
-- **CLI Design**: Standard argparse pattern with help, inspection, and conversion modes
-- **Code Organization**: Clear separation between parsing, formatting, and I/O operations
-- **Documentation**: Comprehensive README and usage examples for operational use
+- **Error Handling**: Graceful degradation with informative error messages and line-by-line validation
+- **CLI Design**: Standard argparse pattern with flexible input/output options
+- **Code Organization**: Clear separation between parsing, conversion, and I/O operations
+- **Documentation**: Comprehensive README with field mapping table and usage examples
 
 ## Learnings and Project Insights
-1. **ROS1 Message Complexity**: Custom message types require manual binary parsing when using rosbags library
-2. **NMEA Standard Details**: Proper checksum calculation and coordinate format conversion are critical
-3. **Binary Data Patterns**: Length-prefixed strings and little-endian float64 encoding in ROS1 messages
-4. **Testing Approach**: Real bag file testing revealed parsing challenges not apparent in initial design
+1. **RTKLIB Format Structure**: Header comments start with %, data lines have consistent field ordering
+2. **GPST Timestamp Handling**: Python datetime handles GPST format well with proper format string
+3. **Unix Epoch Conversion**: Straightforward conversion to both nanoseconds and milliseconds
+4. **Field Availability**: Not all desired fields (HDOP, geoidal separation) available in solution.pos format
 
 ## Current Project State
-- **GPS Bag Converter**: ✅ Complete and tested
+- **GPS Bag Converter**: ✅ Complete and tested (ROS1 to NMEA)
+- **RTK Converter**: ✅ Complete and tested (RTKLIB to GNSS)
 - **Image Position Correlation**: 📁 Existing (trajectory_processor.py)
 - **Web Trajectory Processor**: 📁 Existing (HTML/JS interface)
 - **Metashape Workflows**: 📁 Documentation only
 
 ## Integration Points
-- Output NMEA files can be used with existing GIS software
+- Output .gnss files can be used with existing trajectory processing tools
 - Coordinate data compatible with trajectory_processor.py for image correlation
-- Web interface could potentially integrate NMEA conversion functionality
+- Web interface could potentially integrate RTK conversion functionality
 - Metashape workflows can use converted GPS data for georeferencing
+- RTK converter complements existing GPS bag converter for different input sources
