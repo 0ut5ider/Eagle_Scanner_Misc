@@ -47,7 +47,7 @@ Here's a simple description of how the code functions:
 
    - The script reads trajectory data from a CSV file, which contains position (x, y, z) and quaternion rotation values at specific timestamps.
    - For each image timestamp extracted from the filenames, the script finds the nearest timestamps in the CSV data.
-   - It then calculates interpolated position (x, y, z) and rotation (roll, pitch, yaw in degrees) values based on the closest matching timestamps in the trajectory data.
+   - It then calculates interpolated position (x, y, z) and values based on the closest matching timestamps in the trajectory data.
 
 3. __Output File__:
 
