@@ -23,7 +23,7 @@ Reality Capture will not work since it cannot load unstructured point clouds.
 
 ### Import trajectory file
 - Use space delimiter
-- The columns in the trajectory file are TimeStamp, x, y, z, (and rotations, which willnot be used). Make sure the Metashape columns line up with the columns in the file. The Metashape defaults should be good.
+- The columns in the trajectory file are TimeStamp, x, y, z, (and rotations, which will not be used). Make sure the Metashape columns line up with the columns in the file. The Metashape defaults should be good.
 - Make sure "Start import at row" is set to 2.
 - The coordinate system should be "Local Coordinates"
 
@@ -67,11 +67,12 @@ At this point we need to use the "Image_Position" script to generate a new csv f
 ![image](https://github.com/user-attachments/assets/54afb1c8-a7b5-4568-a4ed-5d67a550c98f)
 - Make sure the "Coordinate system" is set to "Local Coordinates"
 - Delimiter should be "Comma"
-- Make sure "Rotations" is checked
+- Make sure "Rotations" is **NOT** checked
 - "Start import at row" should be set to 2
-- Make sure the Metashape columns line up with the column names from the file. Adjust as necessary to achieve the correct name alignment.
-![image](https://github.com/user-attachments/assets/af8c1f4c-d34f-4ab7-8192-54d997487cbf)
-- After you click OK, the list of images on the left side should now show x,y,z and rotation coordinates.
+- Make sure the Metashape columns line up with the column names from the file. Adjust as necessary to achieve the correct name alignment.   
+![image](https://github.com/user-attachments/assets/c0865277-d152-49d4-a8b0-a483c546295b)
+
+- After you click OK, the list of images on the left side should now show x,y,z coordinates.
 - Select all the images  (using CTRL+A will do that), then right click on any image and seclet "Modify" (at the bottom of the menu)
 - Select the "Accuravy (m)" option, and enter 0.05. This should tell Metashape how much error the position of each camera can have. I don't know if 0.05 is optimal, but it's better than the 10m default value.
 - Go back to the "Workspaces" section of Metashpe (bottom left option)
