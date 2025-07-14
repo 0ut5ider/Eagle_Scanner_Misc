@@ -29,11 +29,7 @@ const Processor = {
                 timestamps,
                 xCoords,
                 yCoords,
-                zCoords,
-                qxValues,
-                qyValues,
-                qzValues,
-                qwValues
+                zCoords
             } = this.extractTrajectoryData(trajectoryData);
             
             // Step 3: Process image files
@@ -43,11 +39,7 @@ const Processor = {
                 timestamps,
                 xCoords,
                 yCoords,
-                zCoords,
-                qxValues,
-                qyValues,
-                qzValues,
-                qwValues
+                zCoords
             );
             
             // Step 4: Generate CSV
@@ -97,10 +89,6 @@ const Processor = {
         const xCoords = [];
         const yCoords = [];
         const zCoords = [];
-        const qxValues = [];
-        const qyValues = [];
-        const qzValues = [];
-        const qwValues = [];
         
         // Process each line
         for (const line of lines) {
@@ -113,16 +101,12 @@ const Processor = {
             try {
                 const values = line.trim().split(/\s+/).map(parseFloat);
                 
-                // Check if we have enough values
-                if (values.length >= 8) {
+                // Check if we have enough values for position data
+                if (values.length >= 4) {
                     timestamps.push(values[0]);
                     xCoords.push(values[1]);
                     yCoords.push(values[2]);
                     zCoords.push(values[3]);
-                    qxValues.push(values[4]);
-                    qyValues.push(values[5]);
-                    qzValues.push(values[6]);
-                    qwValues.push(values[7]);
                 }
             } catch (error) {
                 console.error('Error processing line:', line, error);
@@ -138,11 +122,7 @@ const Processor = {
             timestamps,
             xCoords,
             yCoords,
-            zCoords,
-            qxValues,
-            qyValues,
-            qzValues,
-            qwValues
+            zCoords
         };
     },
     
@@ -153,10 +133,6 @@ const Processor = {
      * @param {Array<number>} xCoords - Array of x coordinates
      * @param {Array<number>} yCoords - Array of y coordinates
      * @param {Array<number>} zCoords - Array of z coordinates
-     * @param {Array<number>} qxValues - Array of quaternion x values
-     * @param {Array<number>} qyValues - Array of quaternion y values
-     * @param {Array<number>} qzValues - Array of quaternion z values
-     * @param {Array<number>} qwValues - Array of quaternion w values
      * @returns {Promise<Array<Object>>} - Promise resolving to array of processed data
      */
     processImageFiles: async function(
@@ -164,11 +140,7 @@ const Processor = {
         timestamps,
         xCoords,
         yCoords,
-        zCoords,
-        qxValues,
-        qyValues,
-        qzValues,
-        qwValues
+        zCoords
     ) {
         const processedData = [];
         const totalFiles = imageFiles.length;
@@ -203,45 +175,11 @@ const Processor = {
                 imgTs
             );
             
-            // Find nearest quaternion values for this timestamp
-            let qx, qy, qz, qw;
-            
-            const idx = Utils.findInsertionPoint(timestamps, imgTs);
-            
-            if (idx === 0) {
-                qx = qxValues[0];
-                qy = qyValues[0];
-                qz = qzValues[0];
-                qw = qwValues[0];
-            } else if (idx === timestamps.length) {
-                qx = qxValues[timestamps.length - 1];
-                qy = qyValues[timestamps.length - 1];
-                qz = qzValues[timestamps.length - 1];
-                qw = qwValues[timestamps.length - 1];
-            } else {
-                // Use nearest timestamp if exact match isn't found
-                const lowerIdx = idx - 1;
-                const upperIdx = idx;
-                
-                const lowerWeight = (imgTs - timestamps[lowerIdx]) / (timestamps[upperIdx] - timestamps[lowerIdx]);
-                
-                qx = qxValues[lowerIdx] + lowerWeight * (qxValues[upperIdx] - qxValues[lowerIdx]);
-                qy = qyValues[lowerIdx] + lowerWeight * (qyValues[upperIdx] - qyValues[lowerIdx]);
-                qz = qzValues[lowerIdx] + lowerWeight * (qzValues[upperIdx] - qzValues[lowerIdx]);
-                qw = qwValues[lowerIdx] + lowerWeight * (qwValues[upperIdx] - qwValues[lowerIdx]);
-            }
-            
-            // Convert quaternions to Euler angles
-            const [roll, pitch, yaw] = Utils.quaternionToEuler(qx, qy, qz, qw);
-            
             processedData.push({
                 filename,
                 x,
                 y,
-                z,
-                yaw,
-                pitch,
-                roll
+                z
             });
             
             // Update progress periodically (not on every iteration to avoid UI slowdown)

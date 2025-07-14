@@ -69,35 +69,6 @@ const Utils = {
         return low;
     },
 
-    /**
-     * Convert quaternion to Euler angles (in degrees)
-     * @param {number} qx - Quaternion x component
-     * @param {number} qy - Quaternion y component
-     * @param {number} qz - Quaternion z component
-     * @param {number} qw - Quaternion w component
-     * @returns {Array<number>} - Euler angles [roll, pitch, yaw] in degrees
-     */
-    quaternionToEuler: function(qx, qy, qz, qw) {
-        // Calculate Euler angles in radians
-        const euler = [0, 0, 0];
-        
-        // Calculate roll (x-axis rotation)
-        const sinRoll = 2.0 * (qw * qx + qy * qz);
-        const cosRoll = 1.0 - 2.0 * (qx * qx + qy * qy);
-        euler[0] = Math.atan2(sinRoll, cosRoll);
-        
-        // Calculate pitch (y-axis rotation)
-        const sinPitch = 2.0 * (qw * qy - qz * qx);
-        euler[1] = Math.asin(Math.max(-1, Math.min(1, sinPitch))); // Clamp to avoid NaN
-        
-        // Calculate yaw (z-axis rotation)
-        const sinYaw = 2.0 * (qw * qz + qx * qy);
-        const cosYaw = 1.0 - 2.0 * (qy * qy + qz * qz);
-        euler[2] = Math.atan2(sinYaw, cosYaw);
-        
-        // Convert from radians to degrees
-        return euler.map(angle => angle * (180 / Math.PI));
-    },
 
     /**
      * Generate CSV content from data

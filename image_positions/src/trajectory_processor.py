@@ -187,10 +187,7 @@ for full_path, img_filename, img_ts in image_data_tuples: # Use the new list of 
         'filename': img_filename, # Use the base filename for the output CSV
         'x': x,
         'y': y,
-        'z': z,
-        'yaw': yaw,
-        'pitch': pitch,
-        'roll': roll
+        'z': z
     })
 
 # Create DataFrame and write to CSV

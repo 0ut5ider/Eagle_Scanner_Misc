@@ -24,9 +24,18 @@
 - **Progress Reporting**: Shows conversion progress for large files
 - **Documentation**: Complete README with usage examples and field mapping
 
+### Trajectory Processor Web App ✅
+- **Complete Implementation**: Browser-based trajectory processing tool
+- **Position-Only Output**: Generates CSV with filename, x, y, z coordinates (rotation elements removed)
+- **Consistent with Python Version**: Now matches the Python trajectory processor output format
+- **Drag & Drop Interface**: User-friendly file selection for images and trajectory data
+- **Client-Side Processing**: No server requirements, fully browser-based
+- **Progress Tracking**: Real-time progress updates during processing
+- **Cross-Browser Compatible**: Works on Chrome, Firefox, Edge, Safari
+- **Documentation Updated**: README reflects position-only output behavior
+
 ### Existing Tools 📁
 - **Trajectory Processor**: `image_positions/src/trajectory_processor.py` for image-GPS correlation
-- **Web Interface**: `trajectory-processor-web/` for browser-based trajectory processing
 - **Metashape Workflows**: Documentation for photogrammetry integration
 
 ## What's Left to Build

@@ -37,11 +37,11 @@ This web application converts the Eagle Scanner's trajectory processor from Pyth
 
 The application performs the following steps:
 
-1. Reads the trajectory file to extract timestamps, positions, and quaternion rotation values
+1. Reads the trajectory file to extract timestamps and position coordinates
 2. Extracts timestamps from image filenames
 3. For each image, finds the nearest timestamps in the trajectory data
-4. Interpolates position (x, y, z) and rotation (roll, pitch, yaw) values
-5. Generates a CSV file with the processed data
+4. Interpolates position (x, y, z) values for each image timestamp
+5. Generates a CSV file with the processed position data
 
 ## Browser Compatibility
 
